@@ -1,0 +1,148 @@
+// LicitaScanner — schema Postgres
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================
+// Auth (compartilhado via SSO futuro com JOL — mesma estrutura)
+// ============================================================
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  plan          String    @default("free") // free | pro | business
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts      Account[]
+  sessions      Session[]
+  alertas       AlertaLicitacao[]
+
+  @@index([email])
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ============================================================
+// Licitações (PNCP)
+// ============================================================
+
+model Licitacao {
+  id                  String   @id   // PNCP numeroControle
+  modalidadeId        Int
+  modalidadeNome      String
+  objeto              String   @db.Text
+  valorEstimado       Float?
+  valorHomologado     Float?
+  uasg                String?
+  orgaoNome           String
+  orgaoCnpj           String?
+  municipio           String?
+  uf                  String?
+  dataPublicacao      DateTime
+  dataAbertura        DateTime?
+  dataEncerramento    DateTime?
+  situacao            String
+  linkEdital          String?
+  linkSistema         String?
+  cnaePrincipal       String?
+  raw                 Json
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  itens               ItemLicitacao[]
+
+  @@index([uf, dataPublicacao])
+  @@index([cnaePrincipal])
+  @@index([modalidadeId])
+  @@index([situacao])
+  @@index([orgaoCnpj])
+}
+
+model ItemLicitacao {
+  id            String     @id @default(cuid())
+  licitacaoId   String
+  licitacao     Licitacao  @relation(fields: [licitacaoId], references: [id], onDelete: Cascade)
+  numero        Int
+  descricao     String     @db.Text
+  unidade       String?
+  quantidade    Float?
+  valorUnitario Float?
+  valorTotal    Float?
+
+  @@index([licitacaoId])
+}
+
+model AlertaLicitacao {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  term        String   // palavra-chave principal
+  uf          String?
+  cnaeFilter  String?
+  valorMin    Float?
+  valorMax    Float?
+  channels    String[] @default(["email"])
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  lastMatchAt DateTime?
+
+  @@index([userId])
+  @@index([active])
+  @@index([uf])
+}
+
+// Tracking de imports (idempotência)
+model ImportRun {
+  id          String   @id @default(cuid())
+  source      String   // "pncp"
+  startedAt   DateTime @default(now())
+  finishedAt  DateTime?
+  inserted    Int      @default(0)
+  updated     Int      @default(0)
+  errors      Int      @default(0)
+  watermark   String?  // última data processada
+
+  @@index([source, startedAt])
+}
