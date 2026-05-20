@@ -136,7 +136,15 @@ export async function listContratacoesByAtualizacao(opts: {
     headers: { Accept: "application/json", "User-Agent": "LicitaScanner/1.0" },
   });
   if (!r.ok) throw new Error(`PNCP ${r.status}: ${url}`);
-  return (await r.json()) as PNCPListResponse;
+  const txt = await r.text();
+  if (!txt || txt.trim() === "") {
+    return { data: [], totalRegistros: 0, totalPaginas: 0, numeroPagina: 1, paginasRestantes: 0 };
+  }
+  try {
+    return JSON.parse(txt) as PNCPListResponse;
+  } catch {
+    return { data: [], totalRegistros: 0, totalPaginas: 0, numeroPagina: 1, paginasRestantes: 0 };
+  }
 }
 
 export function modalidadeNome(id: number): string {

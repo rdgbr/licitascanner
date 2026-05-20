@@ -1,0 +1,51 @@
+name: licita
+
+services:
+  licita-db:
+    image: postgres:16-alpine
+    container_name: licita-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-licita}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-licitascanner}
+    volumes:
+      - licita-db-data:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:5471:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-licita} -d ${POSTGRES_DB:-licitascanner}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - licita-net
+
+  licita-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: licita-app
+    restart: unless-stopped
+    depends_on:
+      licita-db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: "postgresql://${POSTGRES_USER:-licita}:${POSTGRES_PASSWORD}@licita-db:5432/${POSTGRES_DB:-licitascanner}?schema=public"
+      NEXT_PUBLIC_SITE_URL: "https://licitascanner.com.br"
+      AUTH_SECRET: ${AUTH_SECRET:?set in .env}
+      NEXTAUTH_URL: "https://licitascanner.com.br"
+      MAILGUN_API_KEY: ${MAILGUN_API_KEY:-}
+      MAILGUN_DOMAIN: ${MAILGUN_DOMAIN:-mg.juridicoonline.com.br}
+      MAILGUN_FROM: ${MAILGUN_FROM:-LicitaScanner <alerts@mg.juridicoonline.com.br>}
+    ports:
+      - "127.0.0.1:3471:3000"
+    networks:
+      - licita-net
+
+volumes:
+  licita-db-data:
+
+networks:
+  licita-net:
+    driver: bridge

@@ -30,16 +30,35 @@ async function main() {
   let updated = 0;
   let errors = 0;
 
-  // Iterate all modalidades 1..13 (PNCP API requires modalidadeId for some queries)
-  // Use page-by-page across all UFs implicitly (no uf filter)
-  for (let pagina = 1; pagina <= 100; pagina++) {
-    try {
-      const resp = await listContratacoesByAtualizacao({
-        dataInicial,
-        dataFinal,
-        pagina,
-        tamanhoPagina: 50,
-      });
+  // PNCP exige codigoModalidadeContratacao no /atualizacao.
+  // Iteramos modalidades 1..14 e paginas.
+  const MODALIDADES_TO_IMPORT = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+  const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+  for (const modId of MODALIDADES_TO_IMPORT) {
+    for (let pagina = 1; pagina <= 50; pagina++) {
+      let resp: Awaited<ReturnType<typeof listContratacoesByAtualizacao>>;
+      try {
+        // Rate limit: 600ms entre requests (~100 req/min)
+        await sleep(700);
+        resp = await listContratacoesByAtualizacao({
+          dataInicial,
+          dataFinal,
+          codigoModalidadeContratacao: modId,
+          pagina,
+          tamanhoPagina: 50,
+        });
+      } catch (e) {
+        const msg = String(e);
+        if (msg.includes("429")) {
+          console.warn(`[import] mod=${modId} p=${pagina} 429, sleeping 30s`);
+          await sleep(30000);
+          continue;
+        }
+        // 400 normalmente = modalidade sem dados, abandona essa modalidade
+        console.warn(`[import] mod=${modId} p=${pagina} skip:`, msg.slice(0, 100));
+        break;
+      }
 
       if (!resp.data?.length) break;
 
@@ -80,15 +99,8 @@ async function main() {
         }
       }
 
-      console.log(`[import] page ${pagina}/${resp.totalPaginas} (+${inserted}, ~${updated}, !${errors})`);
+      console.log(`[import] mod=${modId} p=${pagina}/${resp.totalPaginas} (+${inserted}, ~${updated}, !${errors})`);
       if (pagina >= resp.totalPaginas) break;
-    } catch (e) {
-      console.error(`[import] page ${pagina} error`, e);
-      errors++;
-      if (errors > 10) {
-        console.error("[import] too many errors, aborting");
-        break;
-      }
     }
   }
 
