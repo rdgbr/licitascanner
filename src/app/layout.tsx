@@ -109,16 +109,46 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         <main className="flex-1">{children}</main>
 
-        <footer className="border-t border-slate-200 bg-slate-50/50 mt-16">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 py-8 text-xs text-slate-500">
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <span>© 2026 LicitaScanner · Dados oficiais PNCP (gov.br)</span>
-              <span>
-                Rede Jurídico:{" "}
-                <a href="https://juridicoonline.com.br" className="text-[#0F4C81] hover:underline">Jurídico Online</a> ·{" "}
-                <a href="https://juridicoempauta.com.br" className="text-[#0F4C81] hover:underline">Jurídico em Pauta</a> ·{" "}
-                <strong>LicitaScanner</strong>
-              </span>
+        <footer className="border-t border-slate-200 bg-slate-50 mt-16">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 py-10">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 text-sm">
+              <div>
+                <div className="font-semibold text-slate-800 mb-3">LicitaScanner</div>
+                <p className="text-xs text-slate-500 mb-3">Monitore licitações públicas do Brasil (PNCP) — federal, estadual e municipal. Alertas grátis por palavra-chave, CNAE ou cidade.</p>
+                <p className="text-xs text-slate-400">Dados oficiais PNCP · Lei 14.133/2021</p>
+              </div>
+              <div>
+                <div className="font-semibold text-slate-700 mb-3 text-xs uppercase tracking-wide">Navegar</div>
+                <ul className="space-y-2 text-xs text-slate-600">
+                  <li><Link href="/buscar" className="hover:text-[#0F4C81]">Buscar licitações</Link></li>
+                  <li><Link href="/categoria" className="hover:text-[#0F4C81]">Por categoria</Link></li>
+                  <li><Link href="/alertas" className="hover:text-[#0F4C81]">Criar alerta</Link></li>
+                  <li><Link href="/cadastro" className="hover:text-[#0F4C81]">Criar conta gratuita</Link></li>
+                </ul>
+              </div>
+              <div>
+                <div className="font-semibold text-slate-700 mb-3 text-xs uppercase tracking-wide">Rede Jurídico</div>
+                <div className="space-y-2.5">
+                  <a href="https://juridicoonline.com.br" className="flex items-start gap-2 group">
+                    <span className="size-6 rounded bg-[#0F4C81]/10 text-[#0F4C81] inline-flex items-center justify-center flex-shrink-0 text-[10px] font-bold mt-0.5">JO</span>
+                    <div>
+                      <div className="text-xs font-medium text-slate-700 group-hover:text-[#0F4C81]">Jurídico Online</div>
+                      <div className="text-[11px] text-slate-400">Consulte dados de empresas participantes das licitações — CNPJ, sócios e contatos.</div>
+                    </div>
+                  </a>
+                  <a href="https://juridicoempauta.com.br" className="flex items-start gap-2 group">
+                    <span className="size-6 rounded bg-[#10B981]/10 text-[#10B981] inline-flex items-center justify-center flex-shrink-0 text-[10px] font-bold mt-0.5">JP</span>
+                    <div>
+                      <div className="text-xs font-medium text-slate-700 group-hover:text-[#0F4C81]">Jurídico em Pauta</div>
+                      <div className="text-[11px] text-slate-400">Acompanhe atos oficiais dos órgãos contratantes — portarias, nomeações e contratos.</div>
+                    </div>
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div className="mt-8 pt-5 border-t border-slate-200 flex flex-wrap justify-between gap-2 text-[11px] text-slate-400">
+              <span>© {new Date().getFullYear()} LicitaScanner — Todos os direitos reservados</span>
+              <span>Dados públicos PNCP · Atualização diária</span>
             </div>
           </div>
         </footer>

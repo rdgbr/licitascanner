@@ -219,6 +219,30 @@ export default async function EditalPage({ params }: Props) {
             Criar alerta grátis
           </Link>
         </div>
+
+        {/* Rede Jurídico — cross-platform deep links */}
+        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <a
+            href={`https://juridicoonline.com.br/buscar?q=${encodeURIComponent(licitacao.orgaoNome)}`}
+            className="flex items-start gap-3 rounded-xl border border-slate-200 bg-white p-4 hover:border-[#0F4C81]/40 hover:bg-[#0F4C81]/5 transition group"
+          >
+            <span className="size-9 rounded-lg bg-[#0F4C81]/10 text-[#0F4C81] inline-flex items-center justify-center flex-shrink-0 text-xs font-bold">JO</span>
+            <div>
+              <div className="text-sm font-semibold text-slate-800 group-hover:text-[#0F4C81]">Consultar {licitacao.orgaoNome}</div>
+              <div className="text-xs text-slate-500 mt-0.5">Dados do órgão contratante — CNPJ, responsáveis e histórico na Receita Federal.</div>
+            </div>
+          </a>
+          <a
+            href={`https://juridicoempauta.com.br/buscar?q=${encodeURIComponent(licitacao.orgaoNome)}`}
+            className="flex items-start gap-3 rounded-xl border border-slate-200 bg-white p-4 hover:border-[#10B981]/50 hover:bg-[#10B981]/5 transition group"
+          >
+            <span className="size-9 rounded-lg bg-[#10B981]/10 text-[#10B981] inline-flex items-center justify-center flex-shrink-0 text-xs font-bold">JP</span>
+            <div>
+              <div className="text-sm font-semibold text-slate-800 group-hover:text-[#0F4C81]">Atos oficiais — {licitacao.orgaoNome}</div>
+              <div className="text-xs text-slate-500 mt-0.5">Portarias, contratos e nomeações publicados em diários oficiais por este órgão.</div>
+            </div>
+          </a>
+        </div>
       </div>
     </>
   );
