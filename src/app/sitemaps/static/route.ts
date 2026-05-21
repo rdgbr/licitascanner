@@ -9,6 +9,7 @@ export function GET() {
   const urls: string[] = [
     `<url><loc>${SITE}/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>`,
     `<url><loc>${SITE}/buscar</loc><changefreq>daily</changefreq><priority>0.8</priority></url>`,
+    `<url><loc>${SITE}/categoria</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>`,
     `<url><loc>${SITE}/cadastro</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>`,
     `<url><loc>${SITE}/planos</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>`,
     `<url><loc>${SITE}/sobre</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>`,
