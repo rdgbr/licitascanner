@@ -1,0 +1,225 @@
+import { notFound } from "next/navigation";
+import Link from "next/link";
+import { prisma } from "@/lib/db";
+import { formatBRL } from "@/lib/pncp";
+import { Calendar, Building2, MapPin, ExternalLink, Bell } from "lucide-react";
+import type { Metadata } from "next";
+
+export const revalidate = 86400;
+export const dynamicParams = true;
+
+type Props = { params: Promise<{ id: string }> };
+
+function slugToId(slug: string) {
+  return slug.replace(/-(\d+\/\d+)$/, "/$1").replace(/--/g, "/");
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id } = await params;
+  const licitacao = await prisma.licitacao.findFirst({
+    where: { id: { contains: id.slice(0, 20) } },
+    select: { objeto: true, orgaoNome: true, uf: true, municipio: true },
+  });
+  if (!licitacao) return {};
+  const title = licitacao.objeto.slice(0, 60);
+  return {
+    title: `${title} — ${licitacao.orgaoNome?.slice(0, 30)} | LicitaScanner`,
+    description: `Edital: ${licitacao.objeto.slice(0, 150)}. Órgão: ${licitacao.orgaoNome}. ${licitacao.municipio || ""}/${licitacao.uf || ""}. Dados do PNCP.`,
+  };
+}
+
+export default async function EditalPage({ params }: Props) {
+  const { id } = await params;
+  const decodedId = decodeURIComponent(id);
+
+  const licitacao = await prisma.licitacao.findFirst({
+    where: {
+      OR: [
+        { id: decodedId },
+        { id: decodedId.replace(/-(\d{4})$/, "/$1") },
+        { id: { startsWith: decodedId.slice(0, 30) } },
+      ],
+    },
+  });
+
+  if (!licitacao) notFound();
+
+  const SITE_URL = "https://licitascanner.com.br";
+  const breadcrumb = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "LicitaScanner", item: SITE_URL },
+      { "@type": "ListItem", position: 2, name: licitacao.uf || "Brasil", item: `${SITE_URL}/${(licitacao.uf || "").toLowerCase()}` },
+      { "@type": "ListItem", position: 3, name: licitacao.objeto.slice(0, 40), item: `${SITE_URL}/edital/${id}` },
+    ],
+  };
+
+  const governmentService = {
+    "@context": "https://schema.org",
+    "@type": "GovernmentService",
+    name: licitacao.objeto.slice(0, 110),
+    description: licitacao.objeto,
+    provider: {
+      "@type": "GovernmentOrganization",
+      name: licitacao.orgaoNome,
+      identifier: licitacao.orgaoCnpj || undefined,
+    },
+    areaServed: { "@type": "State", name: licitacao.uf || "Brasil" },
+    availableChannel: licitacao.linkSistema
+      ? { "@type": "ServiceChannel", serviceUrl: licitacao.linkSistema }
+      : undefined,
+  };
+
+  const rawData = licitacao.raw as Record<string, unknown> | null;
+
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(governmentService) }} />
+
+      <div className="mx-auto max-w-4xl px-4 sm:px-6 py-10">
+        {/* Breadcrumb */}
+        <nav className="text-xs text-slate-500 mb-6 flex items-center gap-1 flex-wrap">
+          <Link href="/" className="hover:text-[#0F4C81]">LicitaScanner</Link>
+          <span>/</span>
+          {licitacao.uf && (
+            <>
+              <Link href={`/${licitacao.uf.toLowerCase()}`} className="hover:text-[#0F4C81]">{licitacao.uf}</Link>
+              <span>/</span>
+            </>
+          )}
+          <span className="text-slate-700 truncate max-w-xs">{licitacao.objeto.slice(0, 40)}…</span>
+        </nav>
+
+        {/* Header */}
+        <div className="mb-6">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-xs uppercase tracking-wider font-semibold text-[#0F4C81] bg-[#0F4C81]/10 px-2 py-1 rounded-full">
+              {licitacao.modalidadeNome}
+            </span>
+            <span className={`text-xs px-2 py-1 rounded-full font-medium ${licitacao.situacao === "Encerrada" ? "bg-slate-100 text-slate-600" : "bg-green-100 text-green-700"}`}>
+              {licitacao.situacao}
+            </span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-slate-900">
+            {licitacao.objeto}
+          </h1>
+        </div>
+
+        {/* Info cards */}
+        <div className="grid sm:grid-cols-2 gap-4 mb-8">
+          <div className="rounded-xl border border-slate-200 bg-white p-4 flex items-start gap-3">
+            <Building2 className="h-5 w-5 text-[#0F4C81] shrink-0 mt-0.5" />
+            <div>
+              <div className="text-xs text-slate-500 mb-1">Órgão contratante</div>
+              <div className="font-medium text-slate-900">{licitacao.orgaoNome}</div>
+              {licitacao.orgaoCnpj && (
+                <>
+                  <div className="text-xs text-slate-500 mt-1">CNPJ: {licitacao.orgaoCnpj}</div>
+                  <Link
+                    href={`https://juridicoonline.com.br/empresa/${licitacao.orgaoCnpj}`}
+                    target="_blank"
+                    rel="noopener"
+                    className="text-xs text-[#0F4C81] hover:underline mt-1 inline-flex items-center gap-1"
+                  >
+                    Ver perfil completo no Jurídico Online <ExternalLink className="h-3 w-3" />
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-slate-200 bg-white p-4 flex items-start gap-3">
+            <MapPin className="h-5 w-5 text-[#0F4C81] shrink-0 mt-0.5" />
+            <div>
+              <div className="text-xs text-slate-500 mb-1">Local</div>
+              <div className="font-medium text-slate-900">{licitacao.municipio || "—"}/{licitacao.uf || "—"}</div>
+            </div>
+          </div>
+
+          {licitacao.valorEstimado != null && (
+            <div className="rounded-xl border border-slate-200 bg-white p-4">
+              <div className="text-xs text-slate-500 mb-1">Valor estimado</div>
+              <div className="text-xl font-bold text-slate-900">{formatBRL(licitacao.valorEstimado)}</div>
+              {licitacao.valorHomologado != null && (
+                <div className="text-xs text-slate-500 mt-1">Homologado: {formatBRL(licitacao.valorHomologado)}</div>
+              )}
+            </div>
+          )}
+
+          <div className="rounded-xl border border-slate-200 bg-white p-4 flex items-start gap-3">
+            <Calendar className="h-5 w-5 text-[#0F4C81] shrink-0 mt-0.5" />
+            <div>
+              <div className="text-xs text-slate-500 mb-1">Datas</div>
+              <div className="text-sm text-slate-900">
+                Publicado: {new Date(licitacao.dataPublicacao).toLocaleDateString("pt-BR")}
+              </div>
+              {licitacao.dataAbertura && (
+                <div className="text-sm text-slate-600">
+                  Abertura: {new Date(licitacao.dataAbertura).toLocaleDateString("pt-BR")}
+                </div>
+              )}
+              {licitacao.dataEncerramento && (
+                <div className="text-sm text-slate-600">
+                  Encerramento: {new Date(licitacao.dataEncerramento).toLocaleDateString("pt-BR")}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Categoria */}
+        {rawData?.categoria ? (
+          <div className="mb-6">
+            <Link
+              href={`/categoria/${String(rawData.categoria)}`}
+              className="inline-flex items-center gap-1 rounded-full bg-[#10B981]/10 text-[#10B981] text-xs px-3 py-1 font-medium hover:bg-[#10B981]/20"
+            >
+              Categoria: {String(rawData.categoria).toUpperCase()}
+            </Link>
+          </div>
+        ) : null}
+
+        {/* Links */}
+        <div className="flex flex-wrap gap-3 mb-8">
+          {licitacao.linkSistema && (
+            <a
+              href={licitacao.linkSistema}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 bg-[#0F4C81] hover:bg-[#0a3a66] text-white text-sm font-medium rounded-lg px-5 h-11 transition"
+            >
+              Acessar edital no PNCP <ExternalLink className="h-4 w-4" />
+            </a>
+          )}
+          {licitacao.linkEdital && licitacao.linkEdital !== licitacao.linkSistema && (
+            <a
+              href={licitacao.linkEdital}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 border border-[#0F4C81] text-[#0F4C81] hover:bg-[#0F4C81]/5 text-sm font-medium rounded-lg px-5 h-11 transition"
+            >
+              Ver edital original <ExternalLink className="h-4 w-4" />
+            </a>
+          )}
+        </div>
+
+        {/* CTA alerta */}
+        <div className="rounded-2xl bg-gradient-to-br from-[#10B981]/10 to-[#0F4C81]/10 border border-[#0F4C81]/20 p-6 flex flex-col sm:flex-row items-center gap-4">
+          <Bell className="h-10 w-10 text-[#0F4C81] shrink-0" />
+          <div className="flex-1 text-center sm:text-left">
+            <p className="font-semibold text-slate-900">Receba alertas de editais similares</p>
+            <p className="text-sm text-slate-500 mt-1">Configure uma palavra-chave ou CNAE e receba e-mail quando sair novo edital.</p>
+          </div>
+          <Link
+            href="/cadastro"
+            className="shrink-0 bg-[#0F4C81] hover:bg-[#0a3a66] text-white text-sm font-medium rounded-lg px-5 h-10 inline-flex items-center transition"
+          >
+            Criar alerta grátis
+          </Link>
+        </div>
+      </div>
+    </>
+  );
+}

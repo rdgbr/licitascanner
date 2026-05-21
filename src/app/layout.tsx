@@ -46,14 +46,34 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
-              "@type": "WebSite",
-              name: "LicitaScanner",
-              url: SITE_URL,
-              potentialAction: {
-                "@type": "SearchAction",
-                target: { "@type": "EntryPoint", urlTemplate: `${SITE_URL}/buscar?q={search_term_string}` },
-                "query-input": "required name=search_term_string",
-              },
+              "@graph": [
+                {
+                  "@type": "WebSite",
+                  "@id": `${SITE_URL}/#website`,
+                  url: SITE_URL,
+                  name: "LicitaScanner",
+                  description:
+                    "Monitore licitações públicas do Brasil (PNCP) — alertas por palavra-chave, CNAE ou cidade.",
+                  inLanguage: "pt-BR",
+                  publisher: { "@id": `${SITE_URL}/#org` },
+                  potentialAction: {
+                    "@type": "SearchAction",
+                    target: { "@type": "EntryPoint", urlTemplate: `${SITE_URL}/buscar?q={search_term_string}` },
+                    "query-input": "required name=search_term_string",
+                  },
+                },
+                {
+                  "@type": "Organization",
+                  "@id": `${SITE_URL}/#org`,
+                  name: "LicitaScanner",
+                  url: SITE_URL,
+                  logo: `${SITE_URL}/logo.png`,
+                  sameAs: [
+                    "https://juridicoonline.com.br",
+                    "https://juridicoempauta.com.br",
+                  ],
+                },
+              ],
             }),
           }}
         />

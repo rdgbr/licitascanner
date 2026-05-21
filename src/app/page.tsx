@@ -37,13 +37,17 @@ export default async function Home() {
       {/* Hero */}
       <section className="bg-gradient-to-br from-[#0F4C81] to-[#0a3a66] text-white">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 py-16">
+          <div className="inline-flex items-center gap-2 text-xs bg-white/15 rounded-full px-3 py-1.5 mb-4 text-white/90">
+            <span className="text-[#10B981] font-bold">Grátis</span> · Mensal cancelável · IA inclusa
+          </div>
           <h1 className="text-3xl sm:text-5xl font-semibold tracking-tight">
             Monitore <span className="text-[#10B981]">licitações públicas</span> em tempo real
           </h1>
           <p className="mt-4 text-white/85 max-w-2xl">
-            Todos os editais publicados no PNCP — federal, estadual, municipal.
-            Receba alertas no seu e-mail quando aparecer licitação no seu CNAE,
-            cidade ou palavra-chave.
+            Todos os editais do PNCP — federal, estadual, municipal.
+            Alertas por e-mail, <strong className="text-white">resumo por IA</strong> e análise de edital.
+            <span className="underline decoration-dotted"> 90 dias premium sem cartão</span>.
+            Plano mensal cancelável quando quiser.
           </p>
 
           <form action="/buscar" method="GET" className="mt-8 max-w-2xl">
