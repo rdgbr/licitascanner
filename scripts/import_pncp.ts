@@ -55,6 +55,12 @@ async function main() {
           await sleep(30000);
           continue;
         }
+        if (msg.includes("504") || msg.includes("503") || msg.includes("502")) {
+          console.warn(`[import] mod=${modId} p=${pagina} server error, sleeping 60s then retry`);
+          await sleep(60000);
+          pagina--; // retry same page
+          continue;
+        }
         // 400 normalmente = modalidade sem dados, abandona essa modalidade
         console.warn(`[import] mod=${modId} p=${pagina} skip:`, msg.slice(0, 100));
         break;
