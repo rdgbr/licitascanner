@@ -19,14 +19,33 @@ export const metadata: Metadata = {
 };
 
 const CATEGORIAS = [
-  { slug: "saas", label: "Software como Serviço (SaaS)", desc: "Plataformas SaaS e sistemas em nuvem", emoji: "☁️" },
-  { slug: "crm_erp", label: "CRM e ERP", desc: "Sistemas de gestão empresarial", emoji: "🏢" },
-  { slug: "desenvolvimento", label: "Desenvolvimento de Software", desc: "Sistemas, aplicações e portais web", emoji: "💻" },
-  { slug: "marketing", label: "Marketing Digital", desc: "Redes sociais, comunicação e publicidade", emoji: "📣" },
-  { slug: "hospedagem", label: "Hospedagem e Infraestrutura", desc: "Hosting, cloud e data center", emoji: "🖥️" },
-  { slug: "suporte", label: "Suporte de TI", desc: "Suporte técnico, manutenção e helpdesk", emoji: "🔧" },
-  { slug: "consultoria_ti", label: "Consultoria de TI", desc: "Consultoria tecnológica e gestão de projetos", emoji: "📋" },
-  { slug: "api_integracao", label: "APIs e Integrações", desc: "Integração de sistemas e middleware", emoji: "🔗" },
+  // TI
+  { slug: "saas", label: "Software como Serviço (SaaS)", emoji: "☁️", desc: "Plataformas SaaS, sistemas em nuvem e assinaturas de software" },
+  { slug: "crm_erp", label: "CRM e ERP", emoji: "🏢", desc: "Sistemas de gestão empresarial, ERP, CRM, folha de pagamento" },
+  { slug: "desenvolvimento", label: "Desenvolvimento de Software", emoji: "💻", desc: "Sistemas, aplicações, portais web e apps móveis" },
+  { slug: "hospedagem", label: "Hospedagem e Infraestrutura TI", emoji: "🖥️", desc: "Hosting, cloud, data center, firewalls e servidores" },
+  { slug: "suporte", label: "Suporte e Manutenção TI", emoji: "🔧", desc: "Helpdesk, service desk e suporte técnico" },
+  { slug: "consultoria_ti", label: "Consultoria de TI", emoji: "📋", desc: "Governança, arquitetura de sistemas e projetos de TI" },
+  { slug: "api_integracao", label: "APIs e Integrações", emoji: "🔗", desc: "Middleware, webservices e integração de sistemas" },
+  { slug: "marketing", label: "Marketing Digital", emoji: "📣", desc: "Redes sociais, publicidade digital e comunicação online" },
+  // Novos setores
+  { slug: "obras_engenharia", label: "Obras e Engenharia", emoji: "🏗️", desc: "Construção civil, pavimentação, reforma e obras de infraestrutura" },
+  { slug: "saude", label: "Saúde", emoji: "🏥", desc: "Medicamentos, equipamentos médicos, serviços de saúde e laboratórios" },
+  { slug: "educacao", label: "Educação", emoji: "📚", desc: "Material escolar, equipamentos pedagógicos e serviços educacionais" },
+  { slug: "veiculos_frota", label: "Veículos e Frota", emoji: "🚗", desc: "Aquisição, manutenção e combustível para frota de veículos" },
+  { slug: "alimentacao", label: "Alimentação e Gêneros", emoji: "🍽️", desc: "Merenda escolar, gêneros alimentícios e refeições" },
+  { slug: "limpeza_conservacao", label: "Limpeza e Conservação", emoji: "🧹", desc: "Serviços de limpeza, higienização e conservação predial" },
+  { slug: "seguranca_vigilancia", label: "Segurança e Vigilância", emoji: "🛡️", desc: "Vigilância armada, monitoramento e CFTV" },
+  { slug: "eventos_cultura", label: "Eventos e Cultura", emoji: "🎭", desc: "Shows artísticos, eventos, festas e produções culturais" },
+  { slug: "mobiliario_equipamentos", label: "Mobiliário e Equipamentos", emoji: "🪑", desc: "Móveis, eletrodomésticos e equipamentos de escritório" },
+  { slug: "material_expediente", label: "Material de Expediente", emoji: "📎", desc: "Papelaria, material de escritório e impressão" },
+  { slug: "energia_eletrica", label: "Energia Elétrica", emoji: "⚡", desc: "Infraestrutura elétrica, iluminação pública e energia solar" },
+  { slug: "transporte", label: "Transporte e Logística", emoji: "🚌", desc: "Transporte escolar, frete, passagens e serviços de logística" },
+  { slug: "publicidade_impressao", label: "Publicidade e Impressão", emoji: "📰", desc: "Material gráfico, publicidade institucional e sinalização" },
+  { slug: "combustivel_lubrificantes", label: "Combustível e Lubrificantes", emoji: "⛽", desc: "Abastecimento de frota, combustíveis e lubrificantes" },
+  { slug: "hardware_informatica", label: "Hardware e Informática", emoji: "🖨️", desc: "Computadores, impressoras, redes e periféricos" },
+  { slug: "uniforme_vestuario", label: "Uniformes e Vestuário", emoji: "👕", desc: "EPIs, uniformes, calçados e vestimentas funcionais" },
+  { slug: "saneamento_meio_ambiente", label: "Saneamento e Meio Ambiente", emoji: "💧", desc: "Água, esgoto, resíduos sólidos e serviços ambientais" },
 ];
 
 async function getCountByCategoria(slug: string): Promise<number> {
