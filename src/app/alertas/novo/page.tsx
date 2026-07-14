@@ -87,7 +87,7 @@ export default function NovoAlertaPage() {
             </button>
             <p className="text-center text-xs text-slate-400">
               Você precisa estar <Link href="/cadastro" className="text-[#0F4C81] hover:underline">logado</Link> para salvar.
-              5 alertas grátis · 90 dias premium sem cartão.
+              5 alertas grátis para sempre · Pro R$ 29,90/mês pra alertas ilimitados.
             </p>
           </div>
         </form>

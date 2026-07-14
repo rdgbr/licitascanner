@@ -46,8 +46,8 @@ export default async function Home() {
           <p className="mt-4 text-white/85 max-w-2xl">
             Todos os editais do PNCP — federal, estadual, municipal.
             Alertas por e-mail, <strong className="text-white">resumo por IA</strong> e análise de edital.
-            <span className="underline decoration-dotted"> 90 dias premium sem cartão</span>.
-            Plano mensal cancelável quando quiser.
+            <span className="underline decoration-dotted"> 5 alertas grátis para sempre</span>.
+            Pro R$ 29,90/mês pra alertas ilimitados.
           </p>
 
           <form action="/buscar" method="GET" className="mt-8 max-w-2xl">

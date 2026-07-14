@@ -3,6 +3,8 @@ import { Bell, Plus, Search, Mail, Pause } from "lucide-react";
 import type { Metadata } from "next";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
+import { PLANOS, formatPreco } from "@/lib/planos";
+import { UpgradeProButton } from "@/components/UpgradeProButton";
 
 export const metadata: Metadata = {
   title: "Meus Alertas de Licitações — LicitaScanner",
@@ -12,6 +14,7 @@ export const metadata: Metadata = {
 export default async function AlertasPage() {
   const session = await auth();
   const userId = (session?.user as { id?: string } | undefined)?.id;
+  const userEmail = session?.user?.email;
 
   const alertas = userId
     ? await prisma.alertaLicitacao.findMany({
@@ -19,6 +22,9 @@ export default async function AlertasPage() {
         orderBy: { createdAt: "desc" },
       })
     : [];
+
+  const limiteFree = PLANOS.free.alertasMax ?? 5;
+  const noLimite = userId && alertas.length >= limiteFree;
 
   return (
     <div className="mx-auto max-w-3xl px-4 sm:px-6 py-10">
@@ -59,7 +65,7 @@ export default async function AlertasPage() {
           {!userId && (
             <p className="mt-4 text-xs text-slate-400">
               <Link href="/cadastro" className="text-[#0F4C81] hover:underline font-medium">Crie conta grátis</Link>{" "}
-              · 5 alertas grátis · 90 dias premium sem cartão
+              · 5 alertas grátis para sempre · Pro {formatPreco(PLANOS.pro.precoMensal)}/mês pra alertas ilimitados
             </p>
           )}
         </div>
@@ -90,10 +96,24 @@ export default async function AlertasPage() {
         </div>
       )}
 
+      {noLimite && (
+        <div className="mt-6 rounded-2xl border border-[#10B981]/30 bg-[#10B981]/5 p-6 text-center">
+          <h2 className="text-base font-semibold text-slate-900">
+            Você atingiu o limite de {limiteFree} alertas do plano grátis
+          </h2>
+          <p className="mt-1.5 text-sm text-slate-600 max-w-md mx-auto">
+            No plano Pro ({formatPreco(PLANOS.pro.precoMensal)}/mês) os alertas são ilimitados.
+          </p>
+          <div className="mt-4 flex justify-center">
+            <UpgradeProButton defaultEmail={userEmail} />
+          </div>
+        </div>
+      )}
+
       <div className="mt-8 grid sm:grid-cols-3 gap-4">
         {[
-          { title: "Alertas grátis", value: "5", desc: "alertas simultâneos no plano gratuito" },
-          { title: "Alertas premium", value: "∞", desc: "alertas ilimitados por R$ 39/mês" },
+          { title: "Alertas grátis", value: String(limiteFree), desc: "alertas simultâneos no plano gratuito" },
+          { title: "Alertas Pro", value: "∞", desc: `alertas ilimitados por ${formatPreco(PLANOS.pro.precoMensal)}/mês` },
           { title: "Editais monitorados", value: "40k+", desc: "editais PNCP atualizados diariamente" },
         ].map((c) => (
           <div key={c.title} className="rounded-xl border border-slate-200 bg-white p-4 text-center">

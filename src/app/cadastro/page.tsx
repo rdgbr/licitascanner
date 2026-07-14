@@ -7,7 +7,7 @@ import { LoginForm } from "@/app/login/LoginForm";
 
 export const metadata: Metadata = {
   title: "Criar conta grátis — LicitaScanner",
-  description: "Cadastre-se grátis e monitore licitações públicas do PNCP. Alertas por e-mail, resumo por IA. 90 dias premium sem cartão.",
+  description: "Cadastre-se grátis e monitore licitações públicas do PNCP. Alertas por e-mail, resumo por IA. 5 alertas grátis para sempre.",
 };
 
 // Sem AUTH_GOOGLE_ID/AUTH_GOOGLE_SECRET no .env, o botão de Google fica
@@ -23,7 +23,7 @@ export default async function CadastroPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-6">
           <span className="inline-flex items-center gap-2 text-xs bg-[#10B981]/10 text-[#10B981] font-semibold rounded-full px-3 py-1.5">
-            <Zap className="h-3.5 w-3.5" /> 90 dias premium grátis · sem cartão
+            <Zap className="h-3.5 w-3.5" /> 5 alertas grátis para sempre · sem cartão
           </span>
         </div>
 
@@ -63,7 +63,7 @@ export default async function CadastroPage() {
           {[
             { icon: Bell, text: "Alertas por e-mail de novos editais no seu CNAE" },
             { icon: Shield, text: "IA resume editais — 2x/dia grátis" },
-            { icon: CheckCircle, text: "90 dias premium sem cartão de crédito" },
+            { icon: CheckCircle, text: "Pro R$ 29,90/mês pra alertas ilimitados, quando quiser" },
           ].map(({ icon: Icon, text }) => (
             <div key={text} className="flex items-center gap-3 text-sm text-slate-600">
               <Icon className="h-4 w-4 text-[#10B981] shrink-0" />{text}

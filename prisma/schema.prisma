@@ -148,3 +148,21 @@ model ImportRun {
 
   @@index([source, startedAt])
 }
+
+// ============================================================
+// Planos (stub — sem processador de pagamento real ainda)
+// ============================================================
+
+// Registro de intenção de assinatura do plano Pro. Sem Stripe/gateway
+// ligado: capturamos o lead aqui e redirecionamos pra contato manual
+// (mesmo padrão do Jurídico Online em src/lib/billing.ts daquele repo).
+model PlanIntent {
+  id        String   @id @default(cuid())
+  email     String
+  plan      String
+  userId    String?
+  createdAt DateTime @default(now())
+
+  @@index([email])
+  @@index([createdAt])
+}

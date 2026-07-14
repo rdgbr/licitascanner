@@ -110,7 +110,7 @@ export default async function MunicipioPage({ params }: Props) {
             href="/cadastro"
             className="mt-3 inline-flex items-center gap-2 bg-[#0F4C81] hover:bg-[#0a3a66] text-white text-sm font-medium rounded-lg px-5 h-10 transition"
           >
-            Criar conta grátis · 90 dias sem cartão
+            Criar conta grátis · 5 alertas para sempre
           </Link>
         </div>
       </div>
