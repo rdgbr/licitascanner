@@ -4,8 +4,9 @@ import { prisma } from "@/lib/db";
 import { CATEGORIAS_META } from "@/lib/categorias";
 import { UFS } from "@/lib/ufs";
 import { formatBRL, licitacaoSlug } from "@/lib/pncp";
-import { Search, Filter } from "lucide-react";
+import { Search, Filter , AlertTriangle } from "lucide-react";
 import type { Metadata } from "next";
+import { semValorEstimadoIrregular } from "@/lib/qualidade";
 
 export const dynamic = "force-dynamic";
 
@@ -186,6 +187,11 @@ export default async function BuscarPage({ searchParams }: { searchParams: Promi
                       </span>
                     )}
                   </div>
+                  {semValorEstimadoIrregular(l.modalidadeNome, l.valorEstimado) && (
+                    <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 inline-flex items-center gap-1 mt-1">
+                      <AlertTriangle className="h-2.5 w-2.5" /> Sem valor estimado
+                    </span>
+                  )}
                   <div className="font-medium text-slate-900 line-clamp-2 group-hover:text-[#0F4C81]">{l.objeto}</div>
                   <div className="mt-2 text-xs text-slate-500 flex flex-wrap gap-x-3">
                     <span>{l.orgaoNome?.slice(0, 40)}</span>

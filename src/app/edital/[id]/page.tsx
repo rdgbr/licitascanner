@@ -2,8 +2,9 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { formatBRL } from "@/lib/pncp";
-import { Calendar, Building2, MapPin, ExternalLink, Bell } from "lucide-react";
+import { Calendar, Building2, MapPin, ExternalLink, Bell, AlertTriangle, Clock } from "lucide-react";
 import type { Metadata } from "next";
+import { semValorEstimadoIrregular, diasParadoSemAtualizacao } from "@/lib/qualidade";
 
 export const revalidate = 86400;
 export const dynamicParams = true;
@@ -72,6 +73,8 @@ export default async function EditalPage({ params }: Props) {
   };
 
   const rawData = licitacao.raw as Record<string, unknown> | null;
+  const semValor = semValorEstimadoIrregular(licitacao.modalidadeNome, licitacao.valorEstimado);
+  const diasParado = diasParadoSemAtualizacao(licitacao.situacao, licitacao.dataEncerramento);
 
   return (
     <>
@@ -107,6 +110,22 @@ export default async function EditalPage({ params }: Props) {
               </span>
             )}
           </div>
+          {(semValor || diasParado) && (
+            <div className="flex flex-wrap items-center gap-2 mt-2">
+              {semValor && (
+                <span className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg font-medium bg-rose-50 text-rose-700 border border-rose-200">
+                  <AlertTriangle className="h-3.5 w-3.5" />
+                  Sem valor estimado — exigido por lei em contratação direta (arts. 29/72, Lei 14.133/2021)
+                </span>
+              )}
+              {diasParado && (
+                <span className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg font-medium bg-amber-50 text-amber-700 border border-amber-200">
+                  <Clock className="h-3.5 w-3.5" />
+                  Prazo encerrado há {diasParado} dias sem atualização de situação no PNCP
+                </span>
+              )}
+            </div>
+          )}
           <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-slate-900">
             {licitacao.objeto}
           </h1>
