@@ -20,7 +20,7 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
   const sp = await searchParams;
   const q = sp.q || "";
   return {
-    title: q ? `"${q}" — Busca de Licitações | LicitaScanner` : "Buscar Licitações Públicas | LicitaScanner",
+    title: q ? `"${q}" — Busca de Licitações` : "Buscar Licitações Públicas",
     description: "Busque editais e licitações públicas do Brasil por palavra-chave, estado ou categoria. Dados oficiais PNCP.",
     robots: q ? "noindex" : "index,follow",
   };

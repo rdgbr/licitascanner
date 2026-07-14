@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!licitacao) return {};
   const title = licitacao.objeto.slice(0, 60);
   return {
-    title: `${title} — ${licitacao.orgaoNome?.slice(0, 30)} | LicitaScanner`,
+    title: `${title} — ${licitacao.orgaoNome?.slice(0, 30)}`,
     description: `Edital: ${licitacao.objeto.slice(0, 150)}. Órgão: ${licitacao.orgaoNome}. ${licitacao.municipio || ""}/${licitacao.uf || ""}. Dados do PNCP.`,
   };
 }
