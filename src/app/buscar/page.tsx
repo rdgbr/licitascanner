@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
+import { CATEGORIAS_META } from "@/lib/categorias";
 import { UFS } from "@/lib/ufs";
 import { formatBRL, licitacaoSlug } from "@/lib/pncp";
 import { Search, Filter } from "lucide-react";
@@ -104,14 +105,7 @@ export default async function BuscarPage({ searchParams }: { searchParams: Promi
     total = count;
   }
 
-  const CATEGORIAS = [
-    { slug: "saas", label: "SaaS" },
-    { slug: "crm_erp", label: "CRM/ERP" },
-    { slug: "desenvolvimento", label: "Dev de Software" },
-    { slug: "marketing", label: "Marketing Digital" },
-    { slug: "hospedagem", label: "Hospedagem/Cloud" },
-    { slug: "suporte", label: "Suporte TI" },
-  ];
+
 
   return (
     <div className="mx-auto max-w-5xl px-4 sm:px-6 py-10">
@@ -148,7 +142,7 @@ export default async function BuscarPage({ searchParams }: { searchParams: Promi
             className="h-11 rounded-lg border border-slate-200 px-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#0F4C81]/30"
           >
             <option value="">Todas as categorias</option>
-            {CATEGORIAS.map((c) => (
+            {CATEGORIAS_META.map((c) => (
               <option key={c.slug} value={c.slug}>{c.label}</option>
             ))}
           </select>

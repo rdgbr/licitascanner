@@ -40,7 +40,7 @@ export default async function MunicipioPage({ params }: Props) {
     },
     orderBy: { dataPublicacao: "desc" },
     take: 30,
-    select: { id: true, objeto: true, orgaoNome: true, municipio: true, modalidadeNome: true, valorEstimado: true, dataPublicacao: true, situacao: true },
+    select: { id: true, objeto: true, orgaoNome: true, municipio: true, modalidadeNome: true, valorEstimado: true, dataPublicacao: true, situacao: true, fonte: true },
   });
 
   const cidadeNome = editais[0]?.municipio || slugToNome(cidadeSlug);
@@ -71,7 +71,7 @@ export default async function MunicipioPage({ params }: Props) {
         <h1 className="text-3xl font-semibold tracking-tight mb-2">
           Licitações em {cidadeNome}/{ufUpper}
         </h1>
-        <p className="text-slate-500 mb-8">{editais.length} editais encontrados · fonte PNCP</p>
+        <p className="text-slate-500 mb-8">{editais.length} editais encontrados</p>
 
         {editais.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-10 text-center">
@@ -89,7 +89,14 @@ export default async function MunicipioPage({ params }: Props) {
                 className="block rounded-xl border border-slate-200 bg-white p-4 hover:border-[#0F4C81] hover:shadow-sm transition group"
               >
                 <div className="text-[11px] uppercase tracking-wider text-[#0F4C81] font-semibold flex justify-between">
-                  <span>{l.modalidadeNome}</span>
+                  <span className="flex items-center gap-2">
+                    <span>{l.modalidadeNome}</span>
+                    {l.fonte !== "pncp" && (
+                      <span className="normal-case text-[10px] font-medium px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">
+                        Diário Oficial Municipal
+                      </span>
+                    )}
+                  </span>
                   <span className={`px-2 py-0.5 rounded-full text-[10px] ${l.situacao === "Encerrada" ? "bg-slate-100 text-slate-500" : "bg-green-100 text-green-700"}`}>
                     {l.situacao}
                   </span>
