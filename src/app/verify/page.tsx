@@ -4,7 +4,7 @@ import { Logo } from "@/components/Logo";
 import { Mail, ShieldCheck } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Confirmar acesso — LicitaScanner",
+  title: "Confirmar acesso",
   robots: { index: false, follow: false },
 };
 

@@ -6,7 +6,7 @@ import { auth } from "@/auth";
 import { LoginForm } from "@/app/login/LoginForm";
 
 export const metadata: Metadata = {
-  title: "Criar conta grátis — LicitaScanner",
+  title: "Criar conta grátis",
   description: "Cadastre-se grátis e monitore licitações públicas do PNCP. Alertas por e-mail, resumo por IA. 5 alertas grátis para sempre.",
 };
 

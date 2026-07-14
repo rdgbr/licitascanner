@@ -7,7 +7,7 @@ import { PLANOS, formatPreco } from "@/lib/planos";
 import { UpgradeProButton } from "@/components/UpgradeProButton";
 
 export const metadata: Metadata = {
-  title: "Meus Alertas de Licitações — LicitaScanner",
+  title: "Meus Alertas de Licitações",
   description: "Gerencie seus alertas. Receba e-mail quando aparecer licitação para seu CNAE, cidade ou palavra-chave.",
 };
 

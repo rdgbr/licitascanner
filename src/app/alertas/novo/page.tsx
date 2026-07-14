@@ -5,7 +5,7 @@ import { Bell } from "lucide-react";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Criar Alerta de Licitação — LicitaScanner",
+  title: "Criar Alerta de Licitação",
   description: "Configure alerta por palavra-chave, CNAE ou estado e receba e-mail quando sair novo edital.",
 };
 

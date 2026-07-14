@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     "Explore licitações públicas do Brasil por categoria: SaaS, CRM, ERP, desenvolvimento de software, marketing digital, hospedagem, suporte de TI e consultoria. Dados PNCP atualizados.",
   alternates: { canonical: "https://licitascanner.com.br/categoria" },
   openGraph: {
-    title: "Categorias de Licitações Públicas — LicitaScanner",
+    title: "Categorias de Licitações Públicas",
     description: "Pregões eletrônicos e concorrências por setor. Alertas grátis por categoria.",
     type: "website",
   },
@@ -75,7 +75,7 @@ export default async function CategoriaIndexPage() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    name: "Licitações por Categoria — LicitaScanner",
+    name: "Licitações por Categoria",
     description: "Explore editais e pregões públicos do Brasil organizados por categoria e setor.",
     url: "https://licitascanner.com.br/categoria",
     publisher: { "@type": "Organization", name: "LicitaScanner", url: "https://licitascanner.com.br" },
