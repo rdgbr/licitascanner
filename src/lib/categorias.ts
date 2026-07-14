@@ -17,7 +17,7 @@ export const CATEGORIAS_KEYWORDS: { slug: string; keywords: string[] }[] = [
   // "escola"/"creche" removidos daqui de propósito: colidiam com a categoria "educacao" (que vem
   // depois) e capturavam praticamente todo edital escolar como "obras_engenharia", mesmo quando não
   // era sobre construção civil. Termos compostos específicos de obra em escola continuam abaixo.
-  { slug: "obras_engenharia", keywords: ["pavimentação","drenagem","construção","obra","recapeamento","engenharia","calçamento","asfalto","ciclovia","calçada","terraplenagem","infraestrutura viária","reforma","revitalização","implantação de rede","esgoto","abastecimento d","saneamento básico","muro de contenção","quadra poliesportiva","unidade básica de saúde","ubs","obra de implantação"] },
+  { slug: "obras_engenharia", keywords: ["pavimentação","drenagem","construção civil","obra","recapeamento","engenharia","calçamento","asfalto","ciclovia","calçada","terraplenagem","infraestrutura viária","reforma predial","revitalização","implantação de rede","esgoto","abastecimento d","saneamento básico","muro de contenção","quadra poliesportiva","unidade básica de saúde","ubs","obra de implantação"] },
   { slug: "saude", keywords: ["medicamento","fármaco","insumo farmacêutico","equipamento médico","equipamento hospitalar","serviço médico","serviço de saúde","laboratorial","análises clínicas","material hospitalar","material médico","manutenção de equipamento médico","raio-x","tomógrafo","ultrassom","ortopedia","cirurgia","internação","pronto-socorro","uti","fisioterapia","odontologia","ambulância","psicologia","saúde mental","vacina","hemodiálise","samu","terapia"] },
   { slug: "educacao", keywords: ["material escolar","material pedagógico","merenda escolar","livro didático","material didático","equipamento escolar","transporte escolar","uniforme escolar","reforma de escola","construção de escola","laboratório escolar","mobiliário escolar","kit escolar","educação infantil","ensino fundamental","estágio supervisionado","bolsa de estudo","escola","creche"] },
   { slug: "veiculos_frota", keywords: ["aquisição de veículo","compra de veículo","veículo","manutenção de veículo","manutenção veicular","frota","van","ônibus","micro-ônibus","caminhão","ambulância","viatura","motocicleta","peças e acessórios","revisão veicular","pneu","seguro veicular","manutenção corretiva de veículo"] },
@@ -34,6 +34,34 @@ export const CATEGORIAS_KEYWORDS: { slug: string; keywords: string[] }[] = [
   { slug: "hardware_informatica", keywords: ["computador","notebook","desktop","impressora","scanner","roteador","switch","rack","nobreak","monitor","teclado","mouse","periférico","material de informática","equipamento de informática","servidor físico","câmera ip","acesso point"] },
   { slug: "uniforme_vestuario", keywords: ["uniforme","epi","calçado","bota","capacete","luva","colete","crachá","farda","vestimenta","roupa de trabalho","equipamento de proteção individual","vestuário"] },
   { slug: "saneamento_meio_ambiente", keywords: ["saneamento","resíduo sólido","lixo","aterro","coleta seletiva","água","esgoto","tratamento de água","estação de tratamento","eta","ete","drenagem pluvial","poluição","licença ambiental","gestão ambiental","fauna","flora","arborização","poda de árvore"] },
+];
+
+export const CATEGORIAS_META: { slug: string; label: string }[] = [
+  { slug: "saas", label: "Software como Serviço (SaaS)" },
+  { slug: "crm_erp", label: "CRM e ERP" },
+  { slug: "desenvolvimento", label: "Desenvolvimento de Software" },
+  { slug: "hospedagem", label: "Hospedagem e Infraestrutura TI" },
+  { slug: "suporte", label: "Suporte e Manutenção TI" },
+  { slug: "consultoria_ti", label: "Consultoria de TI" },
+  { slug: "api_integracao", label: "APIs e Integrações" },
+  { slug: "marketing", label: "Marketing Digital" },
+  { slug: "obras_engenharia", label: "Obras e Engenharia" },
+  { slug: "saude", label: "Saúde" },
+  { slug: "educacao", label: "Educação" },
+  { slug: "veiculos_frota", label: "Veículos e Frota" },
+  { slug: "alimentacao", label: "Alimentação e Gêneros" },
+  { slug: "limpeza_conservacao", label: "Limpeza e Conservação" },
+  { slug: "seguranca_vigilancia", label: "Segurança e Vigilância" },
+  { slug: "eventos_cultura", label: "Eventos e Cultura" },
+  { slug: "mobiliario_equipamentos", label: "Mobiliário e Equipamentos" },
+  { slug: "material_expediente", label: "Material de Expediente" },
+  { slug: "energia_eletrica", label: "Energia Elétrica" },
+  { slug: "transporte", label: "Transporte e Logística" },
+  { slug: "publicidade_impressao", label: "Publicidade e Impressão" },
+  { slug: "combustivel_lubrificantes", label: "Combustível e Lubrificantes" },
+  { slug: "hardware_informatica", label: "Hardware e Informática" },
+  { slug: "uniforme_vestuario", label: "Uniformes e Vestuário" },
+  { slug: "saneamento_meio_ambiente", label: "Saneamento e Meio Ambiente" },
 ];
 
 export function categorizarObjeto(objeto: string): string | null {

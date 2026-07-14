@@ -22,7 +22,7 @@ export async function loginAction(_prev: LoginState, formData: FormData): Promis
   await signIn("nodemailer", {
     email: parsed.data.email,
     redirectTo:
-      parsed.data.next && parsed.data.next.startsWith("/")
+      parsed.data.next && parsed.data.next.startsWith("/") && !parsed.data.next.startsWith("//")
         ? parsed.data.next
         : "/alertas",
   });

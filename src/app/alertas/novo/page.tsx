@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { UFS } from "@/lib/ufs";
+import { CATEGORIAS_META } from "@/lib/categorias";
 import { Bell } from "lucide-react";
 import type { Metadata } from "next";
 
@@ -8,16 +9,7 @@ export const metadata: Metadata = {
   description: "Configure alerta por palavra-chave, CNAE ou estado e receba e-mail quando sair novo edital.",
 };
 
-const CATEGORIAS = [
-  { slug: "saas", label: "SaaS" },
-  { slug: "crm_erp", label: "CRM/ERP" },
-  { slug: "desenvolvimento", label: "Desenvolvimento de Software" },
-  { slug: "marketing", label: "Marketing Digital" },
-  { slug: "hospedagem", label: "Hospedagem/Cloud" },
-  { slug: "suporte", label: "Suporte de TI" },
-  { slug: "consultoria_ti", label: "Consultoria de TI" },
-  { slug: "api_integracao", label: "APIs e Integrações" },
-];
+
 
 export default function NovoAlertaPage() {
   return (
@@ -64,10 +56,10 @@ export default function NovoAlertaPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1.5">Categoria TI</label>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">Categoria</label>
                 <select name="cnae" className="w-full h-11 px-4 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#0F4C81]/30">
                   <option value="">Todas</option>
-                  {CATEGORIAS.map((c) => <option key={c.slug} value={c.slug}>{c.label}</option>)}
+                  {CATEGORIAS_META.map((c) => <option key={c.slug} value={c.slug}>{c.label}</option>)}
                 </select>
               </div>
             </div>

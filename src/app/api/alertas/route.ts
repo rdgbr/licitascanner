@@ -16,6 +16,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.redirect(new URL("/login?next=/alertas/novo", SITE), 307);
   }
 
+  const FREE_LIMIT = 5;
+  const alertasCount = await prisma.alertaLicitacao.count({ where: { userId } });
+  if (alertasCount >= FREE_LIMIT) {
+    return NextResponse.redirect(new URL("/alertas?limit=true", SITE), 307);
+  }
+
   const form = await req.formData();
   const term = String(form.get("term") || "").trim();
   const uf = String(form.get("uf") || "").trim();

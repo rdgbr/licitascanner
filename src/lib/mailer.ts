@@ -133,7 +133,6 @@ export function welcomeEmail(name?: string | null): { html: string; text: string
       <li>Monitoramento de <strong>licitações públicas do Brasil</strong> (PNCP) — federal, estadual e municipal</li>
       <li>Alertas por e-mail quando sair edital pro seu CNAE, UF ou palavra-chave</li>
       <li>Resumo de editais por IA</li>
-      <li>90 dias premium sem cartão de crédito</li>
     </ul>
     <p style="margin:0 0 8px;color:#475569;">Começar é simples: crie seu primeiro alerta agora.</p>`;
   const html = layout({ title: subject, preheader: "Sua conta no LicitaScanner está pronta", body, ctaUrl: `${SITE}/alertas/novo`, ctaLabel: "Criar meu primeiro alerta" });

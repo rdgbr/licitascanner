@@ -148,7 +148,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </div>
             <div className="mt-8 pt-5 border-t border-slate-200 flex flex-wrap justify-between gap-2 text-[11px] text-slate-400">
               <span>© {new Date().getFullYear()} LicitaScanner — Todos os direitos reservados</span>
-              <span>Dados públicos PNCP · Atualização diária</span>
+              <div className="flex gap-3">
+                <Link href="/termos" className="hover:text-slate-600">Termos de uso</Link>
+                <Link href="/privacidade" className="hover:text-slate-600">Privacidade</Link>
+                <span>Dados públicos PNCP · Atualização diária</span>
+              </div>
             </div>
           </div>
         </footer>

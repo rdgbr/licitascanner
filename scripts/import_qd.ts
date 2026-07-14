@@ -58,9 +58,13 @@ function extractValor(entities: Entity[] | null): number | null {
     .map((e) => parseMoneyBRL(e.value))
     .filter((n): n is number => n != null);
   if (!valores.length) return null;
-  // O maior valor citado no bloco costuma ser o valor total do objeto
-  // (valores unitários menores aparecem em listas de item).
-  return Math.max(...valores);
+  if (valores.length === 1) return valores[0];
+  const sorted = [...valores].sort((a, b) => a - b);
+  const max = sorted[sorted.length - 1];
+  const median = sorted[Math.floor(sorted.length / 2)];
+  // Se o maior valor for mais de 5× a mediana, provavelmente é multa/penalidade
+  // contratual mencionada no mesmo bloco — retorna a mediana em vez do máximo.
+  return max > median * 5 ? median : max;
 }
 
 function extractCnpj(entities: Entity[] | null): string | null {

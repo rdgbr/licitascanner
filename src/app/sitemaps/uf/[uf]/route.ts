@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { licitacaoSlug } from "@/lib/pncp";
+import { UFS as UFS_LIST } from "@/lib/ufs";
 
 export const dynamic = "force-dynamic";
 const SITE = "https://licitascanner.com.br";
 
-const UFS = ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"];
+const UFS = UFS_LIST.map((u) => u.sigla);
 
 export async function GET(_req: Request, { params }: { params: Promise<{ uf: string }> }) {
   const { uf } = await params;
