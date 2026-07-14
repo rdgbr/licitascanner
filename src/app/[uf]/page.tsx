@@ -8,13 +8,8 @@ import type { Metadata } from "next";
 
 export const revalidate = 3600;
 export const dynamicParams = true;
-export const dynamic = "force-dynamic";
 
 type Props = { params: Promise<{ uf: string }> };
-
-export async function generateStaticParams() {
-  return UFS.map((u) => ({ uf: u.sigla.toLowerCase() }));
-}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { uf } = await params;
@@ -173,7 +168,7 @@ export default async function UfPage({ params }: Props) {
               >
                 🔔 Alertas grátis em {nome}
               </Link>
-              <p className="mt-2 text-center text-[11px] text-slate-400">Sem cartão · 90 dias grátis</p>
+              <p className="mt-2 text-center text-[11px] text-slate-400">5 alertas grátis para sempre</p>
             </div>
           </div>
         </div>

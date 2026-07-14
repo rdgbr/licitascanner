@@ -159,7 +159,7 @@ export default async function CategoriaPage({ params }: Props) {
               >
                 Criar alerta grátis
               </Link>
-              <p className="mt-2 text-[10px] text-slate-400">90 dias grátis · sem cartão</p>
+              <p className="mt-2 text-[10px] text-slate-400">5 alertas grátis para sempre</p>
             </div>
           </div>
         </div>
