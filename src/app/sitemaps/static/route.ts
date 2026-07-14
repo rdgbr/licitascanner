@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
 import { UFS } from "@/lib/ufs";
+import { CATEGORIAS_KEYWORDS } from "@/lib/categorias";
 
 const SITE = "https://licitascanner.com.br";
-const CATEGORIAS = ["saas", "crm_erp", "desenvolvimento", "marketing", "hospedagem", "suporte", "consultoria_ti", "api_integracao"];
+// Fonte única de verdade: src/lib/categorias.ts (25 categorias)
+const CATEGORIAS = CATEGORIAS_KEYWORDS.map((c) => c.slug);
 
 export function GET() {
   const today = new Date().toISOString().split("T")[0];

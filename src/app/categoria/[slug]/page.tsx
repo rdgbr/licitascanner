@@ -64,7 +64,7 @@ export default async function CategoriaPage({ params }: Props) {
       where: { cnaePrincipal: slug },
       orderBy: { dataPublicacao: "desc" },
       take: 24,
-      select: { id: true, objeto: true, orgaoNome: true, municipio: true, uf: true, modalidadeNome: true, valorEstimado: true, dataPublicacao: true, situacao: true },
+      select: { id: true, objeto: true, orgaoNome: true, municipio: true, uf: true, modalidadeNome: true, valorEstimado: true, dataPublicacao: true, situacao: true, fonte: true },
     }),
     prisma.licitacao.groupBy({
       by: ["uf"],
@@ -112,8 +112,15 @@ export default async function CategoriaPage({ params }: Props) {
                 href={`/edital/${licitacaoSlug(l.id)}`}
                 className="block rounded-xl border border-slate-200 bg-white p-4 hover:border-[#0F4C81] hover:shadow-sm transition group"
               >
-                <div className="text-[11px] uppercase tracking-wider text-[#0F4C81] font-semibold flex justify-between">
-                  <span>{l.modalidadeNome}</span>
+                <div className="text-[11px] uppercase tracking-wider text-[#0F4C81] font-semibold flex justify-between items-center">
+                  <span className="flex items-center gap-2">
+                    <span>{l.modalidadeNome}</span>
+                    {l.fonte !== "pncp" && (
+                      <span className="normal-case text-[10px] font-medium px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">
+                        Diário Oficial Municipal
+                      </span>
+                    )}
+                  </span>
                   <span className={`px-2 py-0.5 rounded-full text-[10px] ${l.situacao === "Encerrada" ? "bg-slate-100 text-slate-500" : "bg-green-100 text-green-700"}`}>
                     {l.situacao}
                   </span>

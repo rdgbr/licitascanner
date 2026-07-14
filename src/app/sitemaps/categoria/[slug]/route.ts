@@ -1,17 +1,13 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { licitacaoSlug } from "@/lib/pncp";
+import { CATEGORIAS_KEYWORDS } from "@/lib/categorias";
 
 export const dynamic = "force-dynamic";
 const SITE = "https://licitascanner.com.br";
 
-const SLUGS_VALIDOS = [
-  "saas","crm_erp","desenvolvimento","hospedagem","suporte","consultoria_ti","api_integracao","marketing",
-  "obras_engenharia","saude","educacao","veiculos_frota","alimentacao","limpeza_conservacao",
-  "seguranca_vigilancia","eventos_cultura","mobiliario_equipamentos","material_expediente",
-  "energia_eletrica","transporte","publicidade_impressao","combustivel_lubrificantes",
-  "hardware_informatica","uniforme_vestuario","saneamento_meio_ambiente",
-];
+// Fonte única de verdade: src/lib/categorias.ts (25 categorias)
+const SLUGS_VALIDOS = CATEGORIAS_KEYWORDS.map((c) => c.slug);
 
 export async function GET(_req: Request, { params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { UFS } from "@/lib/ufs";
 import { licitacaoSlug } from "@/lib/pncp";
+import { CATEGORIAS_KEYWORDS } from "@/lib/categorias";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 21600;
@@ -21,8 +22,8 @@ export async function GET() {
     sitemaps.push(`${SITE}/sitemaps/uf/${u.sigla.toLowerCase()}`);
   }
 
-  // Categoria hubs
-  const categorias = ["saas", "crm_erp", "desenvolvimento", "marketing", "hospedagem", "suporte", "consultoria_ti", "api_integracao"];
+  // Categoria hubs — fonte única de verdade: src/lib/categorias.ts (25 categorias)
+  const categorias = CATEGORIAS_KEYWORDS.map((c) => c.slug);
   for (const c of categorias) {
     sitemaps.push(`${SITE}/sitemaps/categoria/${c}`);
   }

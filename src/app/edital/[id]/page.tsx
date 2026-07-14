@@ -101,6 +101,11 @@ export default async function EditalPage({ params }: Props) {
             <span className={`text-xs px-2 py-1 rounded-full font-medium ${licitacao.situacao === "Encerrada" ? "bg-slate-100 text-slate-600" : "bg-green-100 text-green-700"}`}>
               {licitacao.situacao}
             </span>
+            {licitacao.fonte !== "pncp" && (
+              <span className="text-xs px-2 py-1 rounded-full font-medium bg-amber-100 text-amber-700">
+                Diário Oficial Municipal
+              </span>
+            )}
           </div>
           <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-slate-900">
             {licitacao.objeto}
@@ -200,7 +205,7 @@ export default async function EditalPage({ params }: Props) {
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 border border-[#0F4C81] text-[#0F4C81] hover:bg-[#0F4C81]/5 text-sm font-medium rounded-lg px-5 h-11 transition"
             >
-              Ver edital original <ExternalLink className="h-4 w-4" />
+              {licitacao.fonte === "diario_oficial" ? "Ver diário oficial original" : "Ver edital original"} <ExternalLink className="h-4 w-4" />
             </a>
           )}
         </div>

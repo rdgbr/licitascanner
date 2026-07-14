@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { UFS } from "@/lib/ufs";
 import { formatBRL, licitacaoSlug } from "@/lib/pncp";
@@ -24,6 +25,22 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
   };
 }
 
+const RESULT_SELECT = {
+  id: true,
+  objeto: true,
+  orgaoNome: true,
+  municipio: true,
+  uf: true,
+  modalidadeNome: true,
+  valorEstimado: true,
+  dataPublicacao: true,
+  situacao: true,
+  cnaePrincipal: true,
+  fonte: true,
+} satisfies Prisma.LicitacaoSelect;
+
+type ResultRow = Prisma.LicitacaoGetPayload<{ select: typeof RESULT_SELECT }>;
+
 export default async function BuscarPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
   const sp = await searchParams;
   const q = (sp.q || "").trim();
@@ -31,21 +48,61 @@ export default async function BuscarPage({ searchParams }: { searchParams: Promi
   const categoria = sp.categoria || "";
   const situacao = sp.situacao || "";
 
-  const where: Record<string, unknown> = {};
-  if (q.length >= 2) where.objeto = { contains: q, mode: "insensitive" };
-  if (uf) where.uf = uf;
-  if (categoria) where.cnaePrincipal = categoria;
-  if (situacao) where.situacao = { contains: situacao, mode: "insensitive" };
+  let editais: ResultRow[] = [];
+  let total = 0;
 
-  const [editais, total] = await Promise.all([
-    prisma.licitacao.findMany({
-      where,
-      orderBy: { dataPublicacao: "desc" },
-      take: 30,
-      select: { id: true, objeto: true, orgaoNome: true, municipio: true, uf: true, modalidadeNome: true, valorEstimado: true, dataPublicacao: true, situacao: true, cnaePrincipal: true },
-    }),
-    prisma.licitacao.count({ where }),
-  ]);
+  if (q.length >= 2) {
+    // Full-text search via GIN index (licitacao_objeto_fts) em vez de ILIKE full scan.
+    // q sempre entra como parâmetro do template tag — nunca concatenado em string.
+    const conditions: Prisma.Sql[] = [
+      Prisma.sql`to_tsvector('portuguese', objeto) @@ websearch_to_tsquery('portuguese', ${q})`,
+    ];
+    if (uf) conditions.push(Prisma.sql`uf = ${uf}`);
+    if (categoria) conditions.push(Prisma.sql`"cnaePrincipal" = ${categoria}`);
+    if (situacao) conditions.push(Prisma.sql`situacao ILIKE ${"%" + situacao + "%"}`);
+    const whereSql = Prisma.join(conditions, " AND ");
+
+    const [rankedIds, countRows] = await Promise.all([
+      prisma.$queryRaw<{ id: string }[]>(Prisma.sql`
+        SELECT id FROM "Licitacao"
+        WHERE ${whereSql}
+        ORDER BY ts_rank(to_tsvector('portuguese', objeto), websearch_to_tsquery('portuguese', ${q})) DESC
+        LIMIT 30
+      `),
+      prisma.$queryRaw<{ count: bigint }[]>(Prisma.sql`
+        SELECT count(*)::bigint AS count FROM "Licitacao" WHERE ${whereSql}
+      `),
+    ]);
+
+    total = Number(countRows[0]?.count ?? 0);
+    const ids = rankedIds.map((r) => r.id);
+    if (ids.length > 0) {
+      const rows = await prisma.licitacao.findMany({
+        where: { id: { in: ids } },
+        select: RESULT_SELECT,
+      });
+      const byId = new Map(rows.map((r) => [r.id, r]));
+      // Reordena pelo rank de relevância retornado pela query FTS (findMany não preserva ordem de IN).
+      editais = ids.map((id) => byId.get(id)).filter((r): r is ResultRow => Boolean(r));
+    }
+  } else {
+    const where: Record<string, unknown> = {};
+    if (uf) where.uf = uf;
+    if (categoria) where.cnaePrincipal = categoria;
+    if (situacao) where.situacao = { contains: situacao, mode: "insensitive" };
+
+    const [rows, count] = await Promise.all([
+      prisma.licitacao.findMany({
+        where,
+        orderBy: { dataPublicacao: "desc" },
+        take: 30,
+        select: RESULT_SELECT,
+      }),
+      prisma.licitacao.count({ where }),
+    ]);
+    editais = rows;
+    total = count;
+  }
 
   const CATEGORIAS = [
     { slug: "saas", label: "SaaS" },
@@ -127,7 +184,14 @@ export default async function BuscarPage({ searchParams }: { searchParams: Promi
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
-                  <div className="text-[11px] uppercase tracking-wider text-[#0F4C81] font-semibold mb-1">{l.modalidadeNome}</div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-[11px] uppercase tracking-wider text-[#0F4C81] font-semibold">{l.modalidadeNome}</span>
+                    {l.fonte !== "pncp" && (
+                      <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">
+                        Diário Oficial Municipal
+                      </span>
+                    )}
+                  </div>
                   <div className="font-medium text-slate-900 line-clamp-2 group-hover:text-[#0F4C81]">{l.objeto}</div>
                   <div className="mt-2 text-xs text-slate-500 flex flex-wrap gap-x-3">
                     <span>{l.orgaoNome?.slice(0, 40)}</span>
