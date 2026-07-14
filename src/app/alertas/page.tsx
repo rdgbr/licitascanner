@@ -16,15 +16,19 @@ export default async function AlertasPage() {
   const userId = (session?.user as { id?: string } | undefined)?.id;
   const userEmail = session?.user?.email;
 
-  const alertas = userId
-    ? await prisma.alertaLicitacao.findMany({
-        where: { userId },
-        orderBy: { createdAt: "desc" },
-      })
-    : [];
+  const [alertas, user] = await Promise.all([
+    userId
+      ? prisma.alertaLicitacao.findMany({
+          where: { userId },
+          orderBy: { createdAt: "desc" },
+        })
+      : Promise.resolve([]),
+    userId ? prisma.user.findUnique({ where: { id: userId }, select: { plan: true } }) : Promise.resolve(null),
+  ]);
 
+  const isPro = user?.plan === "pro";
   const limiteFree = PLANOS.free.alertasMax ?? 5;
-  const noLimite = userId && alertas.length >= limiteFree;
+  const noLimite = !!userId && !isPro && alertas.length >= limiteFree;
 
   return (
     <div className="mx-auto max-w-3xl px-4 sm:px-6 py-10">

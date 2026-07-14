@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
+import { PLANOS } from "@/lib/planos";
 
 // Não usar req.url para montar o destino do redirect: atrás do proxy reverso
 // (Cloudflare + Docker), req.url reflete o host interno do container
@@ -16,10 +17,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.redirect(new URL("/login?next=/alertas/novo", SITE), 307);
   }
 
-  const FREE_LIMIT = 5;
-  const alertasCount = await prisma.alertaLicitacao.count({ where: { userId } });
-  if (alertasCount >= FREE_LIMIT) {
-    return NextResponse.redirect(new URL("/alertas?limit=true", SITE), 307);
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { plan: true } });
+  const alertasMax = user?.plan === "pro" ? PLANOS.pro.alertasMax : PLANOS.free.alertasMax;
+  if (alertasMax !== null) {
+    const alertasCount = await prisma.alertaLicitacao.count({ where: { userId } });
+    if (alertasCount >= alertasMax) {
+      return NextResponse.redirect(new URL("/alertas?limit=true", SITE), 307);
+    }
   }
 
   const form = await req.formData();

@@ -1,7 +1,8 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { Check, Minus } from "lucide-react";
+import { Check, Minus, Settings } from "lucide-react";
 import { auth } from "@/auth";
+import { prisma } from "@/lib/db";
 import { PLANOS, formatPreco } from "@/lib/planos";
 import { UpgradeProButton } from "@/components/UpgradeProButton";
 
@@ -11,9 +12,16 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://licitascanner.com.br/planos" },
 };
 
-export default async function PlanosPage() {
+type Props = { searchParams: Promise<{ checkout?: string; already?: string }> };
+
+export default async function PlanosPage({ searchParams }: Props) {
   const session = await auth();
+  const userId = (session?.user as { id?: string } | undefined)?.id;
   const userEmail = session?.user?.email;
+  const { checkout, already } = await searchParams;
+
+  const user = userId ? await prisma.user.findUnique({ where: { id: userId }, select: { plan: true } }) : null;
+  const isPro = user?.plan === "pro";
 
   const linhas: { label: string; free: string | boolean; pro: string | boolean }[] = [
     { label: "Editais do PNCP + diários oficiais municipais", free: true, pro: true },
@@ -61,13 +69,24 @@ export default async function PlanosPage() {
             <span className="text-3xl font-bold text-slate-900">{formatPreco(PLANOS.pro.precoMensal)}</span>
             <span className="text-slate-400 text-sm">/mês</span>
           </div>
-          <p className="mt-1 text-xs text-slate-400">Cobrança manual por enquanto — sem recorrência automática.</p>
+          <p className="mt-1 text-xs text-slate-400">Cancele quando quiser, direto pelo Stripe.</p>
           <div className="mt-6">
-            <UpgradeProButton
-              defaultEmail={userEmail}
-              label="Quero o Pro"
-              className="w-full inline-flex items-center justify-center gap-2 bg-[#0F4C81] hover:bg-[#0a3a66] text-white text-sm font-medium rounded-lg h-11 transition"
-            />
+            {isPro ? (
+              <form action="/api/planos/portal" method="POST">
+                <button
+                  type="submit"
+                  className="w-full inline-flex items-center justify-center gap-2 bg-white border border-[#0F4C81] text-[#0F4C81] hover:bg-[#0F4C81]/5 text-sm font-medium rounded-lg h-11 transition"
+                >
+                  <Settings className="h-4 w-4" /> Gerenciar assinatura
+                </button>
+              </form>
+            ) : (
+              <UpgradeProButton
+                defaultEmail={userEmail}
+                label="Quero o Pro"
+                className="w-full inline-flex items-center justify-center gap-2 bg-[#0F4C81] hover:bg-[#0a3a66] text-white text-sm font-medium rounded-lg h-11 transition"
+              />
+            )}
           </div>
         </div>
       </div>
@@ -97,9 +116,29 @@ export default async function PlanosPage() {
         </table>
       </div>
 
+      {checkout === "success" && (
+        <p className="mt-8 text-center text-sm text-[#10B981] bg-[#10B981]/10 rounded-lg py-3">
+          Pagamento confirmado! Seu plano Pro já está ativo.
+        </p>
+      )}
+      {checkout === "cancel" && (
+        <p className="mt-8 text-center text-sm text-slate-500 bg-slate-100 rounded-lg py-3">
+          Checkout cancelado — nada foi cobrado. Pode tentar de novo quando quiser.
+        </p>
+      )}
+      {checkout === "error" && (
+        <p className="mt-8 text-center text-sm text-rose-600 bg-rose-50 rounded-lg py-3">
+          Não deu pra iniciar o checkout agora. Tenta de novo em instantes.
+        </p>
+      )}
+      {already === "pro" && (
+        <p className="mt-8 text-center text-sm text-[#0F4C81] bg-[#0F4C81]/10 rounded-lg py-3">
+          Você já é assinante Pro — obrigado!
+        </p>
+      )}
       <p className="mt-8 text-center text-xs text-slate-400">
-        Dúvidas sobre o plano Pro? Veja os <Link href="/termos" className="text-[#0F4C81] hover:underline">termos de uso</Link>{" "}
-        ou clique em &quot;Quero o Pro&quot; acima — a gente combina o pagamento por e-mail.
+        Dúvidas sobre o plano Pro? Veja os <Link href="/termos" className="text-[#0F4C81] hover:underline">termos de uso</Link>.
+        Pagamento processado com segurança pelo Stripe.
       </p>
     </div>
   );

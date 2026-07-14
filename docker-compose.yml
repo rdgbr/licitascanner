@@ -38,6 +38,10 @@ services:
       MAILGUN_API_KEY: ${MAILGUN_API_KEY:-}
       MAILGUN_DOMAIN: ${MAILGUN_DOMAIN:-mg.juridicoonline.com.br}
       MAILGUN_FROM: ${MAILGUN_FROM:-LicitaScanner <alerts@mg.juridicoonline.com.br>}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      STRIPE_PUBLISHABLE_KEY: ${STRIPE_PUBLISHABLE_KEY:-}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+      STRIPE_PRICE_ID_PRO: ${STRIPE_PRICE_ID_PRO:-}
     ports:
       - "127.0.0.1:3471:3000"
     networks:
