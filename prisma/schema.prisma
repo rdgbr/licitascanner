@@ -69,7 +69,7 @@ model VerificationToken {
 // ============================================================
 
 model Licitacao {
-  id                  String   @id   // PNCP numeroControle
+  id                  String   @id   // PNCP numeroControle, ou "qd-{atoId}" pra fonte diário oficial
   modalidadeId        Int
   modalidadeNome      String
   objeto              String   @db.Text
@@ -87,6 +87,7 @@ model Licitacao {
   linkEdital          String?
   linkSistema         String?
   cnaePrincipal       String?
+  fonte               String   @default("pncp") // "pncp" | "diario_oficial"
   raw                 Json
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
@@ -98,6 +99,7 @@ model Licitacao {
   @@index([modalidadeId])
   @@index([situacao])
   @@index([orgaoCnpj])
+  @@index([fonte])
 }
 
 model ItemLicitacao {
