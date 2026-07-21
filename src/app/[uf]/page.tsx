@@ -14,11 +14,18 @@ type Props = { params: Promise<{ uf: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { uf } = await params;
-  const nome = ufNome(uf.toUpperCase());
-  if (!nome) return {};
+  const ufUpper = uf.toUpperCase();
+  const nome = ufNome(ufUpper);
+  if (!nome || nome === ufUpper) return {};
+  // O total já era calculado no corpo da página (prisma.count) mas nunca
+  // chegava ao snippet — um número real e específico ("12.345 editais")
+  // é um sinal de escala/atualização que a description genérica não dava,
+  // e ajuda a diferenciar a página na SERP sem inventar nenhum dado novo.
+  const total = await prisma.licitacao.count({ where: { uf: ufUpper } });
+  const totalFmt = total.toLocaleString("pt-BR");
   return {
-    title: `Licitações em ${nome} — Editais Públicos ${new Date().getFullYear()}`,
-    description: `Acompanhe todos os editais e licitações públicas do estado de ${nome}. Pregão eletrônico, concorrência, dispensa. Alertas grátis via LicitaScanner.`,
+    title: `Licitações em ${nome} — ${totalFmt} Editais Públicos`,
+    description: `${totalFmt} editais e licitações públicas ativas em ${nome}: pregão eletrônico, concorrência, dispensa. Alertas grátis por e-mail — LicitaScanner.`,
     alternates: { canonical: `https://licitascanner.com.br/${uf.toLowerCase()}` },
   };
 }

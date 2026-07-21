@@ -30,20 +30,61 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const licitacao = await prisma.licitacao.findFirst({
     where: { id: { contains: id.slice(0, 20) } },
-    select: { objeto: true, orgaoNome: true, uf: true, municipio: true },
+    select: {
+      objeto: true,
+      orgaoNome: true,
+      uf: true,
+      municipio: true,
+      valorEstimado: true,
+      dataEncerramento: true,
+    },
   });
   if (!licitacao) return {};
   // objeto vem do PNCP/Diário Oficial e às vezes traz quebras de linha cruas —
   // normaliza pra um único espaço antes de usar em title/description.
   const objeto = licitacao.objeto.replace(/\s+/g, " ").trim();
-  const title = objeto.slice(0, 60);
+  const orgao = (licitacao.orgaoNome || "").replace(/\s+/g, " ").trim();
   const localizacao = [licitacao.municipio, licitacao.uf].filter(Boolean).join("/");
-  const description = truncateAtWord(
-    `Edital: ${objeto}. Órgão: ${licitacao.orgaoNome}.${localizacao ? ` ${localizacao}.` : ""} Dados do PNCP.`,
-    160
-  );
+
+  // Title: objeto + órgão, sempre cortados no limite de palavra mais próximo.
+  // Antes usava .slice() bruto nos dois campos e cortava no meio da palavra
+  // (ex.: "...PRESTAÇÃO DE SERVI — FUNDO MUNICIPAL DE SA"), o que passa
+  // impressão de link quebrado na SERP e derruba CTR mesmo em boa posição.
+  const tituloObjeto = truncateAtWord(objeto, 50);
+  const tituloOrgao = truncateAtWord(orgao, 25);
+  const title = tituloOrgao ? `${tituloObjeto} — ${tituloOrgao}` : tituloObjeto;
+
+  // Description: monta em blocos por prioridade e só inclui o próximo bloco
+  // se ele couber inteiro no limite de 160 — nunca corta frase/palavra ao
+  // meio. Valor estimado e prazo de encerramento entram logo após o objeto
+  // porque são os dois dados que mais convertem clique em edital público
+  // (o bucket de posição 4-10, 78,7% do inventário, tinha CTR 6-10x abaixo
+  // do esperado mostrando só o objeto genérico).
+  // Remove ponto final que às vezes já vem no objeto bruto do PNCP, senão o
+  // bloco fecha com ".." quando o texto não precisou ser truncado.
+  const objetoDesc = truncateAtWord(objeto, 100).replace(/\.+$/, "");
+  const blocos: string[] = [`Edital: ${objetoDesc}${objetoDesc.endsWith("…") ? "" : "."}`];
+  if (licitacao.valorEstimado != null) {
+    blocos.push(`Valor estimado: ${formatBRL(licitacao.valorEstimado)}.`);
+  }
+  // situacao no banco frequentemente fica desatualizada (edital já venceu mas
+  // segue "Divulgada no PNCP" — o mesmo problema que a página já sinaliza via
+  // diasParadoSemAtualizacao). Por isso o filtro real aqui é a própria data,
+  // não o campo situacao: nunca anunciar "encerra em" pra um prazo já passado.
+  if (licitacao.dataEncerramento && new Date(licitacao.dataEncerramento) > new Date()) {
+    blocos.push(`Encerra em ${new Date(licitacao.dataEncerramento).toLocaleDateString("pt-BR")}.`);
+  }
+  blocos.push(`Órgão: ${orgao}.${localizacao ? ` ${localizacao}.` : ""}`);
+
+  let description = "";
+  for (const bloco of blocos) {
+    const proximo = description ? `${description} ${bloco}` : bloco;
+    if (proximo.length > 160) break;
+    description = proximo;
+  }
+
   return {
-    title: `${title} — ${licitacao.orgaoNome?.slice(0, 30)}`,
+    title,
     description,
     alternates: { canonical: `${METADATA_SITE_URL}/edital/${id}` },
   };
