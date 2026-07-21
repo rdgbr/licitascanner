@@ -28,8 +28,21 @@ function truncateAtWord(text: string, maxLen: number): string {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
+  // Mesma lógica de busca da página em si (EditalPage abaixo) -- usar um
+  // lookup diferente aqui causava um bug real em produção: contains com só
+  // 20 chars de prefixo bate em dezenas de licitações do mesmo orgao/ano, e
+  // sem orderBy o Postgres retorna uma linha arbitraria a cada chamada, entao
+  // o title/description as vezes mostravam valor/prazo de OUTRA licitacao
+  // diferente da que aparece no corpo da pagina.
+  const decodedId = decodeURIComponent(id);
   const licitacao = await prisma.licitacao.findFirst({
-    where: { id: { contains: id.slice(0, 20) } },
+    where: {
+      OR: [
+        { id: decodedId },
+        { id: decodedId.replace(/-(\d{4})$/, "/$1") },
+        { id: { startsWith: decodedId.slice(0, 30) } },
+      ],
+    },
     select: {
       objeto: true,
       orgaoNome: true,
