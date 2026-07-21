@@ -15,6 +15,17 @@ function slugToId(slug: string) {
   return slug.replace(/-(\d+\/\d+)$/, "/$1").replace(/--/g, "/");
 }
 
+const METADATA_SITE_URL = "https://licitascanner.com.br";
+
+// Trunca no limite de palavra mais próximo (nunca no meio de uma palavra) e
+// só adiciona "…" quando o texto realmente foi cortado.
+function truncateAtWord(text: string, maxLen: number): string {
+  if (text.length <= maxLen) return text;
+  const cut = text.slice(0, maxLen);
+  const lastSpace = cut.lastIndexOf(" ");
+  return `${(lastSpace > 0 ? cut.slice(0, lastSpace) : cut).trimEnd()}…`;
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const licitacao = await prisma.licitacao.findFirst({
@@ -22,10 +33,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     select: { objeto: true, orgaoNome: true, uf: true, municipio: true },
   });
   if (!licitacao) return {};
-  const title = licitacao.objeto.slice(0, 60);
+  // objeto vem do PNCP/Diário Oficial e às vezes traz quebras de linha cruas —
+  // normaliza pra um único espaço antes de usar em title/description.
+  const objeto = licitacao.objeto.replace(/\s+/g, " ").trim();
+  const title = objeto.slice(0, 60);
+  const localizacao = [licitacao.municipio, licitacao.uf].filter(Boolean).join("/");
+  const description = truncateAtWord(
+    `Edital: ${objeto}. Órgão: ${licitacao.orgaoNome}.${localizacao ? ` ${localizacao}.` : ""} Dados do PNCP.`,
+    160
+  );
   return {
     title: `${title} — ${licitacao.orgaoNome?.slice(0, 30)}`,
-    description: `Edital: ${licitacao.objeto.slice(0, 150)}. Órgão: ${licitacao.orgaoNome}. ${licitacao.municipio || ""}/${licitacao.uf || ""}. Dados do PNCP.`,
+    description,
+    alternates: { canonical: `${METADATA_SITE_URL}/edital/${id}` },
   };
 }
 

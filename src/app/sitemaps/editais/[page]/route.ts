@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { licitacaoSlug } from "@/lib/pncp";
+import { EDITAIS_SITEMAP_PAGE_SIZE } from "@/lib/sitemap-config";
 
 export const dynamic = "force-dynamic";
 const SITE = "https://licitascanner.com.br";
-const PAGE_SIZE = 20_000;
 
 export async function GET(_req: Request, { params }: { params: Promise<{ page: string }> }) {
   const { page } = await params;
@@ -12,8 +12,8 @@ export async function GET(_req: Request, { params }: { params: Promise<{ page: s
 
   const editais = await prisma.licitacao.findMany({
     orderBy: { dataPublicacao: "desc" },
-    skip: (pageNum - 1) * PAGE_SIZE,
-    take: PAGE_SIZE,
+    skip: (pageNum - 1) * EDITAIS_SITEMAP_PAGE_SIZE,
+    take: EDITAIS_SITEMAP_PAGE_SIZE,
     select: { id: true, dataPublicacao: true },
   });
 
